@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useStartConversation } from "@/hooks/useStartConversation";
 
 interface ProductCardProps {
   id: number;
@@ -11,6 +12,7 @@ interface ProductCardProps {
   originalPrice?: number;
   image: string;
   seller: {
+    id?: string;
     name: string;
     avatar: string;
     verified: boolean;
@@ -36,10 +38,22 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
+  const { startConversation } = useStartConversation();
 
   const handleLike = () => {
     setLiked(!liked);
     setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+  };
+
+  const handleContact = () => {
+    if (seller.id) {
+      startConversation({
+        sellerId: seller.id,
+        productTitle: title,
+        productImage: image,
+        productPrice: price,
+      });
+    }
   };
 
   const formatPrice = (value: number) => {
@@ -154,7 +168,11 @@ const ProductCard = ({
               <Share2 className="h-5 w-5" />
             </button>
           </div>
-          <Button size="sm" className="gradient-primary text-primary-foreground border-0 shadow-soft">
+          <Button
+            size="sm"
+            className="gradient-primary text-primary-foreground border-0 shadow-soft"
+            onClick={handleContact}
+          >
             Comprar
           </Button>
         </div>
