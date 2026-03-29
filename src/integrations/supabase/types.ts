@@ -104,6 +104,62 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          is_urgent: boolean | null
+          location: string | null
+          original_price: number | null
+          price: number
+          seller_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          is_urgent?: boolean | null
+          location?: string | null
+          original_price?: number | null
+          price: number
+          seller_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          is_urgent?: boolean | null
+          location?: string | null
+          original_price?: number | null
+          price?: number
+          seller_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -114,6 +170,7 @@ export type Database = {
           name: string
           updated_at: string
           user_id: string
+          whatsapp_number: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -124,6 +181,7 @@ export type Database = {
           name: string
           updated_at?: string
           user_id: string
+          whatsapp_number?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -134,6 +192,7 @@ export type Database = {
           name?: string
           updated_at?: string
           user_id?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
