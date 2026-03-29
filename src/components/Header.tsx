@@ -25,11 +25,8 @@ const Header = () => {
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
         {/* Logo */}
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-primary">
-            <span className="text-lg font-bold text-primary-foreground">V</span>
-          </div>
-          <span className="hidden text-xl font-bold text-foreground sm:block">
-            Vende<span className="text-primary">Aí</span>
+          <span className="text-xl font-bold text-foreground">
+            MOZ <span className="text-primary">VENDAS</span>
           </span>
         </div>
 
