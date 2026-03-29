@@ -95,7 +95,7 @@ const Auth = () => {
         } else {
           toast({
             title: "Conta criada!",
-            description: "Você já pode começar a usar o VendeAí",
+            description: "Você já pode começar a usar o MOZ VENDAS",
           });
           navigate("/");
         }
@@ -120,11 +120,8 @@ const Auth = () => {
         <Card className="shadow-card">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary">
-                <span className="text-xl font-bold text-primary-foreground">V</span>
-              </div>
               <span className="text-2xl font-bold text-foreground">
-                Vende<span className="text-primary">Aí</span>
+                MOZ <span className="text-primary">VENDAS</span>
               </span>
             </div>
             <CardTitle className="text-xl">

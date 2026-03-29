@@ -1,4 +1,4 @@
-import { Heart, MapPin, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
+import { Heart, MapPin, MessageCircle, Share2, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useStartConversation } from "@/hooks/useStartConversation";
 
 interface ProductCardProps {
-  id: number;
+  id: string;
   title: string;
   price: number;
   originalPrice?: number;
@@ -16,6 +16,7 @@ interface ProductCardProps {
     name: string;
     avatar: string;
     verified: boolean;
+    whatsappNumber?: string;
   };
   location: string;
   likes: number;
@@ -56,10 +57,25 @@ const ProductCard = ({
     }
   };
 
+  const handleBuy = () => {
+    const message = encodeURIComponent(
+      `Olá ${seller.name}! Vi o anúncio "${title}" por ${formatPrice(price)} no MOZ VENDAS e estou interessado(a). Ainda está disponível?`
+    );
+
+    if (seller.whatsappNumber) {
+      const phone = seller.whatsappNumber.replace(/\D/g, "");
+      window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+    } else {
+      handleContact();
+    }
+  };
+
   const formatPrice = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
+    return new Intl.NumberFormat("pt-MZ", {
       style: "currency",
-      currency: "BRL",
+      currency: "MZN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
     }).format(value);
   };
 
@@ -72,11 +88,17 @@ const ProductCard = ({
       {/* Seller Header */}
       <div className="flex items-center justify-between p-3 border-b border-border">
         <div className="flex items-center gap-2">
-          <img
-            src={seller.avatar}
-            alt={seller.name}
-            className="h-8 w-8 rounded-full object-cover ring-2 ring-primary/20"
-          />
+          {seller.avatar ? (
+            <img
+              src={seller.avatar}
+              alt={seller.name}
+              className="h-8 w-8 rounded-full object-cover ring-2 ring-primary/20"
+            />
+          ) : (
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary ring-2 ring-primary/20">
+              <User className="h-4 w-4 text-muted-foreground" />
+            </div>
+          )}
           <div>
             <div className="flex items-center gap-1">
               <span className="text-sm font-semibold text-foreground">
@@ -158,11 +180,14 @@ const ProductCard = ({
                   liked && "fill-accent text-accent scale-110"
                 )}
               />
-              {likeCount}
+              {likeCount > 0 && likeCount}
             </button>
-            <button className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <button
+              onClick={handleContact}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
               <MessageCircle className="h-5 w-5" />
-              {comments}
+              {comments > 0 && comments}
             </button>
             <button className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
               <Share2 className="h-5 w-5" />
@@ -171,7 +196,7 @@ const ProductCard = ({
           <Button
             size="sm"
             className="gradient-primary text-primary-foreground border-0 shadow-soft"
-            onClick={handleContact}
+            onClick={handleBuy}
           >
             Comprar
           </Button>

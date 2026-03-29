@@ -61,7 +61,10 @@ const Header = () => {
               </Button>
             </>
           )}
-          <Button className="gradient-accent text-accent-foreground border-0 gap-2 shadow-soft hover:opacity-90 transition-opacity">
+          <Button
+            className="gradient-accent text-accent-foreground border-0 gap-2 shadow-soft hover:opacity-90 transition-opacity"
+            onClick={() => user ? navigate("/add-product") : navigate("/auth")}
+          >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Anunciar</span>
           </Button>
@@ -82,7 +85,7 @@ const Header = () => {
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Mensagens
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
                   <User className="mr-2 h-4 w-4" />
                   Meu Perfil
                 </DropdownMenuItem>
