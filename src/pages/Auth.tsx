@@ -95,7 +95,7 @@ const Auth = () => {
         } else {
           toast({
             title: "Conta criada!",
-            description: "Você já pode começar a usar o VendeAí",
+            description: "Você já pode começar a usar o MOZ VENDAS",
           });
           navigate("/");
         }

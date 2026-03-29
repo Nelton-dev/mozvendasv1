@@ -85,7 +85,7 @@ const Header = () => {
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Mensagens
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
                   <User className="mr-2 h-4 w-4" />
                   Meu Perfil
                 </DropdownMenuItem>
