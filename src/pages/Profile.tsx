@@ -160,14 +160,34 @@ const Profile = () => {
     );
   }
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20 sm:pb-8">
       <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
-        <div className="flex h-14 items-center gap-4 px-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold text-foreground">Meu Perfil</h1>
+        <div className="flex h-14 items-center justify-between gap-4 px-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-lg font-semibold text-foreground">Meu Perfil</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5">
+              <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Cliente</span>
+              <Switch
+                checked={isSellerMode}
+                onCheckedChange={setIsSellerMode}
+                className="scale-75"
+              />
+              <span className="text-xs font-medium text-muted-foreground">Vendedor</span>
+              <Store className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+          </div>
         </div>
       </header>
 
@@ -176,101 +196,117 @@ const Profile = () => {
         <div className="flex flex-col items-center gap-3">
           <div className="relative">
             {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt="Avatar"
-                className="h-24 w-24 rounded-full object-cover ring-4 ring-primary/20"
-              />
+              <img src={avatarUrl} alt="Avatar" className="h-24 w-24 rounded-full object-cover ring-4 ring-primary/20" />
             ) : (
               <div className="flex h-24 w-24 items-center justify-center rounded-full bg-secondary ring-4 ring-primary/20">
                 <User className="h-12 w-12 text-muted-foreground" />
               </div>
             )}
             <label className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-soft">
-              {uploading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Camera className="h-4 w-4" />
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarUpload}
-                disabled={uploading}
-              />
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+              <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploading} />
             </label>
           </div>
+          <p className="text-sm font-medium text-foreground">{name || "Utilizador"}</p>
+          {isSellerMode && shopName && (
+            <p className="text-xs text-primary font-semibold flex items-center gap-1">
+              <Store className="h-3 w-3" /> {shopName}
+            </p>
+          )}
         </div>
 
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="text-lg">Informações pessoais</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Seu nome"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="whatsapp"
-                  value={whatsappNumber}
-                  onChange={(e) => setWhatsappNumber(e.target.value)}
-                  placeholder="+258 84 123 4567"
-                  className="pl-10"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Os compradores usarão este número para contactá-lo
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location">Localização</Label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Maputo, Moçambique"
-                    className="pl-10"
-                  />
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleGetLocation}
-                  title="Usar minha localização"
-                >
-                  <MapPin className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleSave}
-              className="w-full gradient-primary text-primary-foreground border-0"
-              disabled={saving}
-            >
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salvar Perfil
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3">
+          {isSellerMode && (
+            <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/my-products")}>
+              <Package className="h-5 w-5 text-primary" />
+              <span className="text-xs">Meus Produtos</span>
             </Button>
-          </CardContent>
-        </Card>
+          )}
+          <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/messages")}>
+            <ShoppingBag className="h-5 w-5 text-primary" />
+            <span className="text-xs">Mensagens</span>
+          </Button>
+          <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/terms")}>
+            <FileText className="h-5 w-5 text-primary" />
+            <span className="text-xs">Termos</span>
+          </Button>
+          <Button variant="outline" className="gap-2 h-auto py-3 flex-col text-destructive hover:text-destructive" onClick={handleSignOut}>
+            <LogOut className="h-5 w-5" />
+            <span className="text-xs">Sair</span>
+          </Button>
+        </div>
+
+        <Tabs defaultValue="personal" className="w-full">
+          <TabsList className="w-full">
+            <TabsTrigger value="personal" className="flex-1">Pessoal</TabsTrigger>
+            {isSellerMode && <TabsTrigger value="shop" className="flex-1">Loja</TabsTrigger>}
+          </TabsList>
+
+          <TabsContent value="personal" className="mt-4">
+            <Card className="shadow-card">
+              <CardHeader><CardTitle className="text-lg">Informações pessoais</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome</Label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="whatsapp">WhatsApp</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input id="whatsapp" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="+258 84 123 4567" className="pl-10" />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Os compradores usarão este número para contactá-lo</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location">Localização</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Maputo, Moçambique" className="pl-10" />
+                    </div>
+                    <Button type="button" variant="outline" size="icon" onClick={handleGetLocation}>
+                      <MapPin className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {isSellerMode && (
+            <TabsContent value="shop" className="mt-4">
+              <Card className="shadow-card">
+                <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Store className="h-5 w-5 text-primary" /> Minha Loja</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="shopName">Nome da Loja</Label>
+                    <Input id="shopName" value={shopName} onChange={(e) => setShopName(e.target.value)} placeholder="Ex: Tech Store Maputo" />
+                    <p className="text-xs text-muted-foreground">Este nome será exibido nos seus anúncios</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="shopDescription">Descrição da Loja</Label>
+                    <Textarea
+                      id="shopDescription"
+                      value={shopDescription}
+                      onChange={(e) => setShopDescription(e.target.value)}
+                      placeholder="Descreva o que sua loja oferece para passar credibilidade aos compradores..."
+                      rows={3}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+        </Tabs>
+
+        <Button onClick={handleSave} className="w-full gradient-primary text-primary-foreground border-0" disabled={saving}>
+          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Salvar Perfil
+        </Button>
       </div>
+      <BottomNav />
     </div>
   );
 };
