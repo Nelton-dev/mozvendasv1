@@ -165,9 +165,12 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           id: string
+          is_seller_mode: boolean | null
           is_verified: boolean | null
           location: string | null
           name: string
+          shop_description: string | null
+          shop_name: string | null
           updated_at: string
           user_id: string
           whatsapp_number: string | null
@@ -176,9 +179,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id?: string
+          is_seller_mode?: boolean | null
           is_verified?: boolean | null
           location?: string | null
           name: string
+          shop_description?: string | null
+          shop_name?: string | null
           updated_at?: string
           user_id: string
           whatsapp_number?: string | null
@@ -187,9 +193,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id?: string
+          is_seller_mode?: boolean | null
           is_verified?: boolean | null
           location?: string | null
           name?: string
+          shop_description?: string | null
+          shop_name?: string | null
           updated_at?: string
           user_id?: string
           whatsapp_number?: string | null
