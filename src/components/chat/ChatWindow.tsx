@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, ArrowLeft, User } from "lucide-react";
+import { Send, ArrowLeft, User, Check, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMessages } from "@/hooks/useMessages";
@@ -104,10 +104,10 @@ const ChatWindow = ({ conversation, onBack }: ChatWindowProps) => {
             </p>
             {conversation.product_price && (
               <p className="text-sm font-bold text-primary">
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(conversation.product_price)}
+                {new Intl.NumberFormat("pt-MZ", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                }).format(conversation.product_price)} MZN
               </p>
             )}
           </div>
@@ -148,14 +148,23 @@ const ChatWindow = ({ conversation, onBack }: ChatWindowProps) => {
                   <p className="text-sm whitespace-pre-wrap break-words">
                     {message.content}
                   </p>
-                  <p
+                  <div
                     className={cn(
-                      "text-[10px] mt-1",
+                      "flex items-center justify-end gap-1 mt-1",
                       isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
                     )}
                   >
-                    {format(new Date(message.created_at), "HH:mm", { locale: ptBR })}
-                  </p>
+                    <span className="text-[10px]">
+                      {format(new Date(message.created_at), "HH:mm", { locale: ptBR })}
+                    </span>
+                    {isOwn && (
+                      message.is_read ? (
+                        <CheckCheck className="h-3.5 w-3.5 text-sky-300" />
+                      ) : (
+                        <Check className="h-3.5 w-3.5" />
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
             );

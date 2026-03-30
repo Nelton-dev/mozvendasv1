@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -112,8 +111,7 @@ const Profile = () => {
           const data = await res.json();
           const city = data.address?.city || data.address?.town || data.address?.village || "";
           const state = data.address?.state || "";
-          const country = data.address?.country || "";
-          const loc = [city, state, country].filter(Boolean).join(", ");
+          const loc = [city, state].filter(Boolean).join(", ");
           setLocation(loc);
           toast({ title: "Localização obtida!" });
         } catch {
@@ -136,9 +134,8 @@ const Profile = () => {
           name,
           location,
           whatsapp_number: whatsappNumber,
-          is_seller_mode: isSellerMode,
-          shop_name: shopName || null,
-          shop_description: shopDescription || null,
+          shop_name: isSellerMode ? (shopName || null) : null,
+          shop_description: isSellerMode ? (shopDescription || null) : null,
         })
         .eq("user_id", user.id);
 
@@ -175,18 +172,18 @@ const Profile = () => {
             </Button>
             <h1 className="text-lg font-semibold text-foreground">Meu Perfil</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5">
-              <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground">Cliente</span>
-              <Switch
-                checked={isSellerMode}
-                onCheckedChange={setIsSellerMode}
-                className="scale-75"
-              />
-              <span className="text-xs font-medium text-muted-foreground">Vendedor</span>
-              <Store className="h-3.5 w-3.5 text-muted-foreground" />
-            </div>
+          <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5">
+            {isSellerMode ? (
+              <>
+                <Store className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-semibold text-primary">Vendedor</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold text-muted-foreground">Cliente</span>
+              </>
+            )}
           </div>
         </div>
       </header>
