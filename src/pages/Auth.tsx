@@ -201,6 +201,12 @@ const Auth = () => {
                   {isLogin ? "Cadastre-se" : "Entrar"}
                 </button>
               </p>
+              <p className="text-center text-xs text-muted-foreground mt-2">
+                Ao continuar, você concorda com os nossos{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="text-primary hover:underline">
+                  Termos e Condições
+                </button>
+              </p>
             </CardFooter>
           </form>
         </Card>

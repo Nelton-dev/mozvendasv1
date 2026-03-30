@@ -9,6 +9,9 @@ import Auth from "./pages/Auth";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import AddProduct from "./pages/AddProduct";
+import EditProduct from "./pages/EditProduct";
+import MyProducts from "./pages/MyProducts";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,7 +29,9 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/add-product" element={<AddProduct />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/edit-product/:id" element={<EditProduct />} />
+            <Route path="/my-products" element={<MyProducts />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

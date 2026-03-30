@@ -44,7 +44,7 @@ const ProductFeed = () => {
       const sellerIds = [...new Set((data || []).map((p) => p.seller_id))];
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, name, avatar_url, is_verified, whatsapp_number")
+        .select("user_id, name, avatar_url, is_verified, whatsapp_number, shop_name, is_seller_mode")
         .in("user_id", sellerIds);
 
       const profileMap = new Map(
@@ -101,7 +101,9 @@ const ProductFeed = () => {
             image={product.images?.[0] || "/placeholder.svg"}
             seller={{
               id: product.seller_id,
-              name: product.seller?.name || "Vendedor",
+              name: (product.seller as any)?.is_seller_mode && (product.seller as any)?.shop_name
+                ? (product.seller as any).shop_name
+                : product.seller?.name || "Vendedor",
               avatar: product.seller?.avatar_url || "",
               verified: product.seller?.is_verified || false,
               whatsappNumber: product.seller?.whatsapp_number || undefined,
