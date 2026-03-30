@@ -22,46 +22,61 @@ interface Product {
   };
 }
 
-const ProductFeed = () => {
+interface ProductFeedProps {
+  selectedCategory?: string | null;
+}
+
+const ProductFeed = ({ selectedCategory }: ProductFeedProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [selectedCategory]);
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+      let query = supabase
         .from("products")
         .select("*")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
 
+      if (selectedCategory) {
+        query = query.eq("category", selectedCategory);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
 
       // Fetch seller profiles
       const sellerIds = [...new Set((data || []).map((p) => p.seller_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, name, avatar_url, is_verified, whatsapp_number, shop_name, is_seller_mode")
-        .in("user_id", sellerIds);
+      if (sellerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, name, avatar_url, is_verified, whatsapp_number, shop_name, is_seller_mode")
+          .in("user_id", sellerIds);
 
-      const profileMap = new Map(
-        (profiles || []).map((p) => [p.user_id, p])
-      );
+        const profileMap = new Map(
+          (profiles || []).map((p) => [p.user_id, p])
+        );
 
-      const enriched = (data || []).map((p) => ({
-        ...p,
-        seller: profileMap.get(p.seller_id) || {
-          name: "Vendedor",
-          avatar_url: null,
-          is_verified: false,
-          whatsapp_number: null,
-        },
-      }));
+        const enriched = (data || []).map((p) => ({
+          ...p,
+          seller: profileMap.get(p.seller_id) || {
+            name: "Vendedor",
+            avatar_url: null,
+            is_verified: false,
+            whatsapp_number: null,
+          },
+        }));
 
-      setProducts(enriched);
+        setProducts(enriched);
+      } else {
+        setProducts([]);
+      }
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -80,9 +95,11 @@ const ProductFeed = () => {
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <p className="text-lg font-semibold text-foreground mb-1">Nenhum produto ainda</p>
+        <p className="text-lg font-semibold text-foreground mb-1">
+          {selectedCategory ? "Nenhum produto nesta categoria" : "Nenhum produto ainda"}
+        </p>
         <p className="text-sm text-muted-foreground">
-          Seja o primeiro a publicar um anúncio!
+          {selectedCategory ? "Tente outra categoria" : "Seja o primeiro a publicar um anúncio!"}
         </p>
       </div>
     );
