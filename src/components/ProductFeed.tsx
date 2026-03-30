@@ -101,7 +101,9 @@ const ProductFeed = () => {
             image={product.images?.[0] || "/placeholder.svg"}
             seller={{
               id: product.seller_id,
-              name: product.seller?.name || "Vendedor",
+              name: (product.seller as any)?.is_seller_mode && (product.seller as any)?.shop_name
+                ? (product.seller as any).shop_name
+                : product.seller?.name || "Vendedor",
               avatar: product.seller?.avatar_url || "",
               verified: product.seller?.is_verified || false,
               whatsappNumber: product.seller?.whatsapp_number || undefined,
