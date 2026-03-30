@@ -24,6 +24,9 @@ const Profile = () => {
   const [location, setLocation] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isSellerMode, setIsSellerMode] = useState(false);
+  const [shopName, setShopName] = useState("");
+  const [shopDescription, setShopDescription] = useState("");
 
   useEffect(() => {
     if (!authLoading && !user) {
