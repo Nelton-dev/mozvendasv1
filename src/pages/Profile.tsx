@@ -41,7 +41,7 @@ const Profile = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("name, location, avatar_url, whatsapp_number")
+        .select("name, location, avatar_url, whatsapp_number, is_seller_mode, shop_name, shop_description")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -51,6 +51,9 @@ const Profile = () => {
         setLocation(data.location || "");
         setAvatarUrl(data.avatar_url);
         setWhatsappNumber(data.whatsapp_number || "");
+        setIsSellerMode(data.is_seller_mode || false);
+        setShopName(data.shop_name || "");
+        setShopDescription(data.shop_description || "");
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
