@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
 
 const Profile = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
