@@ -132,7 +132,14 @@ const Profile = () => {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ name, location, whatsapp_number: whatsappNumber })
+        .update({
+          name,
+          location,
+          whatsapp_number: whatsappNumber,
+          is_seller_mode: isSellerMode,
+          shop_name: shopName || null,
+          shop_description: shopDescription || null,
+        })
         .eq("user_id", user.id);
 
       if (error) throw error;
