@@ -156,7 +156,8 @@ const Auth = () => {
 
         <Card className="shadow-card">
           <CardHeader className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img src={mozLogo} alt="MOZ VENDAS" className="h-16 w-16" />
               <span className="text-2xl font-bold text-foreground">
                 MOZ <span className="text-primary">VENDAS</span>
               </span>
