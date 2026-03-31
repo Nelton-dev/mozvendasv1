@@ -3,6 +3,7 @@ import { Search, Bell, MessageCircle, Plus, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import mozLogo from "@/assets/moz-vendas-logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +26,8 @@ const Header = () => {
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
         {/* Logo */}
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-          <span className="text-xl font-bold text-foreground">
+          <img src={mozLogo} alt="MOZ VENDAS" className="h-9 w-9" />
+          <span className="text-xl font-bold text-foreground hidden sm:inline">
             MOZ <span className="text-primary">VENDAS</span>
           </span>
         </div>

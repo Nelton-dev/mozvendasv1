@@ -12,6 +12,7 @@ import { Loader2, ArrowLeft, MapPin, Store, ShoppingBag } from "lucide-react";
 import { z } from "zod";
 import { lovable } from "@/integrations/lovable/index";
 import { Separator } from "@/components/ui/separator";
+import mozLogo from "@/assets/moz-vendas-logo.png";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres");
@@ -155,7 +156,8 @@ const Auth = () => {
 
         <Card className="shadow-card">
           <CardHeader className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img src={mozLogo} alt="MOZ VENDAS" className="h-16 w-16" />
               <span className="text-2xl font-bold text-foreground">
                 MOZ <span className="text-primary">VENDAS</span>
               </span>
@@ -347,6 +349,16 @@ const Auth = () => {
                 )}
                 Continuar com Google
               </Button>
+
+              {isLogin && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Esqueceu a senha?
+                </button>
+              )}
 
               <p className="text-sm text-muted-foreground text-center">
                 {isLogin ? "Não tem uma conta?" : "Já tem uma conta?"}{" "}
