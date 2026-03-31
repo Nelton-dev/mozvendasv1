@@ -17,9 +17,9 @@ const StoriesBar = () => {
   useEffect(() => {
     const fetchProfiles = async () => {
       const { data } = await supabase
-        .from("profiles")
-        .select("id, user_id, name, avatar_url")
-        .order("created_at", { ascending: false })
+        .from("public_profiles" as any)
+        .select("user_id, name, avatar_url")
+        .order("created_at" as any, { ascending: false })
         .limit(20);
       if (data) setProfiles(data);
     };

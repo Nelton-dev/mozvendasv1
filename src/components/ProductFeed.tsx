@@ -72,15 +72,20 @@ const ProductFeed = ({ selectedCategory }: ProductFeedProps) => {
           (profiles || []).map((p) => [p.user_id, p])
         );
 
-        const enriched = (data || []).map((p) => ({
-          ...p,
-          seller: profileMap.get(p.seller_id) || {
-            name: "Vendedor",
-            avatar_url: null,
-            is_verified: false,
-            whatsapp_number: null,
-          },
-        }));
+        const enriched = (data || []).map((p) => {
+          const profile = profileMap.get(p.seller_id);
+          return {
+            ...p,
+            seller: {
+              name: profile?.name || "Vendedor",
+              avatar_url: profile?.avatar_url || null,
+              is_verified: profile?.is_verified || false,
+              whatsapp_number: whatsappMap.get(p.seller_id) || null,
+              shop_name: profile?.shop_name || null,
+              is_seller_mode: profile?.is_seller_mode || false,
+            },
+          };
+        });
 
         setProducts(enriched);
       } else {
