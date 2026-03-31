@@ -3,6 +3,7 @@ import { Search, Bell, MessageCircle, Plus, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import mozLogo from "@/assets/moz-vendas-logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
