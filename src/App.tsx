@@ -34,6 +34,8 @@ const App = () => (
             <Route path="/edit-product/:id" element={<EditProduct />} />
             <Route path="/my-products" element={<MyProducts />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

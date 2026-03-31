@@ -350,6 +350,16 @@ const Auth = () => {
                 Continuar com Google
               </Button>
 
+              {isLogin && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Esqueceu a senha?
+                </button>
+              )}
+
               <p className="text-sm text-muted-foreground text-center">
                 {isLogin ? "Não tem uma conta?" : "Já tem uma conta?"}{" "}
                 <button
