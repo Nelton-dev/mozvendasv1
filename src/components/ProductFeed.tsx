@@ -57,19 +57,19 @@ const ProductFeed = ({ selectedCategory }: ProductFeedProps) => {
         const { data: profiles } = await supabase
           .from("public_profiles" as any)
           .select("user_id, name, avatar_url, is_verified, shop_name, is_seller_mode")
-          .in("user_id", sellerIds);
+          .in("user_id", sellerIds) as { data: Array<{user_id: string; name: string; avatar_url: string | null; is_verified: boolean; shop_name: string | null; is_seller_mode: boolean}> | null };
 
         // Fetch WhatsApp numbers via RPC for each seller
         const whatsappMap = new Map<string, string | null>();
         await Promise.all(
           sellerIds.map(async (sid) => {
-            const { data: wa } = await supabase.rpc("get_seller_whatsapp", { p_seller_id: sid });
-            whatsappMap.set(sid, wa);
+            const { data: wa } = await supabase.rpc("get_seller_whatsapp" as any, { p_seller_id: sid });
+            whatsappMap.set(sid, wa as string | null);
           })
         );
 
         const profileMap = new Map(
-          (profiles || []).map((p) => [p.user_id, p])
+          (profiles || []).map((p: any) => [p.user_id, p])
         );
 
         const enriched = (data || []).map((p) => {

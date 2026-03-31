@@ -20,8 +20,8 @@ const StoriesBar = () => {
         .from("public_profiles" as any)
         .select("user_id, name, avatar_url")
         .order("created_at" as any, { ascending: false })
-        .limit(20);
-      if (data) setProfiles(data);
+        .limit(20) as { data: Array<{user_id: string; name: string; avatar_url: string | null}> | null };
+      if (data) setProfiles(data.map((p, i) => ({ id: p.user_id, user_id: p.user_id, name: p.name, avatar_url: p.avatar_url })));
     };
     fetchProfiles();
   }, []);
