@@ -55,9 +55,18 @@ const ProductFeed = ({ selectedCategory }: ProductFeedProps) => {
       const sellerIds = [...new Set((data || []).map((p) => p.seller_id))];
       if (sellerIds.length > 0) {
         const { data: profiles } = await supabase
-          .from("profiles")
-          .select("user_id, name, avatar_url, is_verified, whatsapp_number, shop_name, is_seller_mode")
+          .from("public_profiles" as any)
+          .select("user_id, name, avatar_url, is_verified, shop_name, is_seller_mode")
           .in("user_id", sellerIds);
+
+        // Fetch WhatsApp numbers via RPC for each seller
+        const whatsappMap = new Map<string, string | null>();
+        await Promise.all(
+          sellerIds.map(async (sid) => {
+            const { data: wa } = await supabase.rpc("get_seller_whatsapp", { p_seller_id: sid });
+            whatsappMap.set(sid, wa);
+          })
+        );
 
         const profileMap = new Map(
           (profiles || []).map((p) => [p.user_id, p])
