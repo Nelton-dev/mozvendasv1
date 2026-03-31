@@ -43,10 +43,10 @@ export const useConversations = () => {
           
           // Get other user's profile
           const { data: profileData } = await supabase
-            .from("profiles")
+            .from("public_profiles" as any)
             .select("name, avatar_url")
             .eq("user_id", otherUserId)
-            .maybeSingle();
+            .maybeSingle() as { data: { name: string; avatar_url: string | null } | null };
 
           // Get last message
           const { data: messagesData } = await supabase

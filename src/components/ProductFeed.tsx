@@ -55,23 +55,37 @@ const ProductFeed = ({ selectedCategory }: ProductFeedProps) => {
       const sellerIds = [...new Set((data || []).map((p) => p.seller_id))];
       if (sellerIds.length > 0) {
         const { data: profiles } = await supabase
-          .from("profiles")
-          .select("user_id, name, avatar_url, is_verified, whatsapp_number, shop_name, is_seller_mode")
-          .in("user_id", sellerIds);
+          .from("public_profiles" as any)
+          .select("user_id, name, avatar_url, is_verified, shop_name, is_seller_mode")
+          .in("user_id", sellerIds) as { data: Array<{user_id: string; name: string; avatar_url: string | null; is_verified: boolean; shop_name: string | null; is_seller_mode: boolean}> | null };
 
-        const profileMap = new Map(
-          (profiles || []).map((p) => [p.user_id, p])
+        // Fetch WhatsApp numbers via RPC for each seller
+        const whatsappMap = new Map<string, string | null>();
+        await Promise.all(
+          sellerIds.map(async (sid) => {
+            const { data: wa } = await supabase.rpc("get_seller_whatsapp" as any, { p_seller_id: sid });
+            whatsappMap.set(sid, wa as string | null);
+          })
         );
 
-        const enriched = (data || []).map((p) => ({
-          ...p,
-          seller: profileMap.get(p.seller_id) || {
-            name: "Vendedor",
-            avatar_url: null,
-            is_verified: false,
-            whatsapp_number: null,
-          },
-        }));
+        const profileMap = new Map(
+          (profiles || []).map((p: any) => [p.user_id, p])
+        );
+
+        const enriched = (data || []).map((p) => {
+          const profile = profileMap.get(p.seller_id);
+          return {
+            ...p,
+            seller: {
+              name: profile?.name || "Vendedor",
+              avatar_url: profile?.avatar_url || null,
+              is_verified: profile?.is_verified || false,
+              whatsapp_number: whatsappMap.get(p.seller_id) || null,
+              shop_name: profile?.shop_name || null,
+              is_seller_mode: profile?.is_seller_mode || false,
+            },
+          };
+        });
 
         setProducts(enriched);
       } else {
