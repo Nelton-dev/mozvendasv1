@@ -12,6 +12,7 @@ import { Loader2, ArrowLeft, MapPin, Store, ShoppingBag } from "lucide-react";
 import { z } from "zod";
 import { lovable } from "@/integrations/lovable/index";
 import { Separator } from "@/components/ui/separator";
+import mozLogo from "@/assets/moz-vendas-logo.png";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres");
