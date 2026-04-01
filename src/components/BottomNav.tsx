@@ -9,7 +9,7 @@ const BottomNav = () => {
 
   const navItems = [
     { icon: Home, label: "Início", active: true, path: "/" },
-    { icon: Search, label: "Buscar", path: "/" },
+    { icon: Play, label: "Reels", path: "/reels" },
     { icon: Plus, label: "Anunciar", isAction: true, path: user ? "/add-product" : "/auth" },
     { icon: MessageCircle, label: "Chat", path: user ? "/messages" : "/auth" },
     { icon: User, label: "Perfil", path: user ? "/profile" : "/auth" },

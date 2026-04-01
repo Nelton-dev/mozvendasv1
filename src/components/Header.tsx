@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { Search, Bell, MessageCircle, Plus, User, LogOut } from "lucide-react";
+import { Search, Bell, MessageCircle, Plus, User, LogOut, Moon, Sun, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import mozLogo from "@/assets/moz-vendas-logo.png";
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
 const Header = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const handleSignOut = async () => {
     await signOut();
@@ -44,7 +46,22 @@ const Header = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Reels */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:flex"
+            onClick={() => navigate("/reels")}
+          >
+            <Play className="h-5 w-5" />
+          </Button>
+
+          {/* Dark mode toggle */}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} title={theme === "dark" ? "Modo claro" : "Modo escuro"}>
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+
           {user && (
             <>
               <Button variant="ghost" size="icon" className="relative hidden sm:flex">
