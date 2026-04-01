@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Home, Search, Plus, Heart, User, MessageCircle } from "lucide-react";
+import { Home, Play, Plus, User, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
