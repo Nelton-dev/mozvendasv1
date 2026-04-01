@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Camera, Loader2, MapPin, Phone, User, Store, ShoppingBag, Package, FileText, LogOut } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, MapPin, Phone, User, Store, ShoppingBag, Package, FileText, LogOut, Video, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -215,10 +215,16 @@ const Profile = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
           {isSellerMode && (
-            <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/my-products")}>
-              <Package className="h-5 w-5 text-primary" />
-              <span className="text-xs">Meus Produtos</span>
-            </Button>
+            <>
+              <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/my-products")}>
+                <Package className="h-5 w-5 text-primary" />
+                <span className="text-xs">Meus Produtos</span>
+              </Button>
+              <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/upload-video")}>
+                <Video className="h-5 w-5 text-primary" />
+                <span className="text-xs">Novo Vídeo</span>
+              </Button>
+            </>
           )}
           <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/messages")}>
             <ShoppingBag className="h-5 w-5 text-primary" />
@@ -227,6 +233,10 @@ const Profile = () => {
           <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/terms")}>
             <FileText className="h-5 w-5 text-primary" />
             <span className="text-xs">Termos</span>
+          </Button>
+          <Button variant="outline" className="gap-2 h-auto py-3 flex-col" onClick={() => navigate("/account-settings")}>
+            <Settings className="h-5 w-5 text-muted-foreground" />
+            <span className="text-xs">Configurações</span>
           </Button>
           <Button variant="outline" className="gap-2 h-auto py-3 flex-col text-destructive hover:text-destructive" onClick={handleSignOut}>
             <LogOut className="h-5 w-5" />

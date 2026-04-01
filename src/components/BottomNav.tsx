@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Home, Search, Plus, Heart, User, MessageCircle } from "lucide-react";
+import { Home, Play, Plus, User, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -9,7 +9,7 @@ const BottomNav = () => {
 
   const navItems = [
     { icon: Home, label: "Início", active: true, path: "/" },
-    { icon: Search, label: "Buscar", path: "/" },
+    { icon: Play, label: "Reels", path: "/reels" },
     { icon: Plus, label: "Anunciar", isAction: true, path: user ? "/add-product" : "/auth" },
     { icon: MessageCircle, label: "Chat", path: user ? "/messages" : "/auth" },
     { icon: User, label: "Perfil", path: user ? "/profile" : "/auth" },
