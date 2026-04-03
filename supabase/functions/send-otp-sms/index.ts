@@ -8,6 +8,14 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
 
+async function hashCode(code: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(code);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -31,14 +39,15 @@ serve(async (req) => {
 
     // Generate 6-digit OTP
     const code = String(Math.floor(100000 + Math.random() * 900000));
+    const hashedCode = await hashCode(code);
     const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Store OTP
+    // Store hashed OTP
     const { error: dbError } = await supabase.from("otp_codes").insert({
       phone,
-      code,
+      code: hashedCode,
       expires_at,
     });
     if (dbError) throw new Error(`DB error: ${dbError.message}`);
