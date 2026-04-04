@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     // Verify user
-    const userClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
     const { data: { user }, error: authError } = await userClient.auth.getUser();
