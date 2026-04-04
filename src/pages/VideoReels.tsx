@@ -4,7 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Heart, MessageCircle, Share2, Volume2, VolumeX, Play, ShoppingBag, User } from "lucide-react";
+import {
+  ArrowLeft, Heart, MessageCircle, Share2, Volume2, VolumeX,
+  Play, ShoppingBag, User, Trash2, Edit
+} from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import BottomNav from "@/components/BottomNav";
 
 interface VideoReel {
@@ -18,6 +25,8 @@ interface VideoReel {
   created_at: string;
   seller_name?: string;
   seller_avatar?: string;
+  likes_count?: number;
+  is_liked?: boolean;
 }
 
 const VideoReels = () => {
@@ -25,6 +34,8 @@ const VideoReels = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const navigate = useNavigate();
@@ -33,7 +44,7 @@ const VideoReels = () => {
 
   useEffect(() => {
     fetchVideos();
-  }, []);
+  }, [user]);
 
   const fetchVideos = async () => {
     try {
@@ -50,7 +61,6 @@ const VideoReels = () => {
         return;
       }
 
-      // Fetch seller profiles
       const sellerIds = [...new Set(data.map((v) => v.seller_id))];
       const { data: profiles } = await supabase
         .from("public_profiles" as any)
@@ -61,12 +71,37 @@ const VideoReels = () => {
         (profiles || []).map((p: any) => [p.user_id, p])
       );
 
+      // Fetch likes counts
+      const videoIds = data.map((v) => v.id);
+      const { data: likesData } = await supabase
+        .from("video_likes")
+        .select("video_id")
+        .in("video_id", videoIds);
+
+      const likesCountMap = new Map<string, number>();
+      (likesData || []).forEach((l: any) => {
+        likesCountMap.set(l.video_id, (likesCountMap.get(l.video_id) || 0) + 1);
+      });
+
+      // Fetch user's likes
+      let userLikes = new Set<string>();
+      if (user) {
+        const { data: userLikesData } = await supabase
+          .from("video_likes")
+          .select("video_id")
+          .eq("user_id", user.id)
+          .in("video_id", videoIds);
+        userLikes = new Set((userLikesData || []).map((l: any) => l.video_id));
+      }
+
       const enriched = data.map((v) => {
         const profile = profileMap.get(v.seller_id);
         return {
           ...v,
           seller_name: (profile as any)?.name || "Vendedor",
           seller_avatar: (profile as any)?.avatar_url,
+          likes_count: likesCountMap.get(v.id) || 0,
+          is_liked: userLikes.has(v.id),
         };
       });
 
@@ -75,6 +110,76 @@ const VideoReels = () => {
       console.error("Error fetching videos:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLike = async (videoId: string) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    const video = videos.find((v) => v.id === videoId);
+    if (!video) return;
+
+    // Optimistic update
+    setVideos((prev) =>
+      prev.map((v) =>
+        v.id === videoId
+          ? {
+              ...v,
+              is_liked: !v.is_liked,
+              likes_count: (v.likes_count || 0) + (v.is_liked ? -1 : 1),
+            }
+          : v
+      )
+    );
+
+    try {
+      if (video.is_liked) {
+        await supabase
+          .from("video_likes")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("video_id", videoId);
+      } else {
+        await supabase
+          .from("video_likes")
+          .insert({ user_id: user.id, video_id: videoId });
+      }
+    } catch {
+      // Revert on error
+      setVideos((prev) =>
+        prev.map((v) =>
+          v.id === videoId
+            ? {
+                ...v,
+                is_liked: video.is_liked,
+                likes_count: video.likes_count,
+              }
+            : v
+        )
+      );
+    }
+  };
+
+  const handleDeleteVideo = async () => {
+    if (!videoToDelete || !user) return;
+    try {
+      const { error } = await supabase
+        .from("product_videos")
+        .delete()
+        .eq("id", videoToDelete)
+        .eq("seller_id", user.id);
+
+      if (error) throw error;
+      setVideos((prev) => prev.filter((v) => v.id !== videoToDelete));
+      toast({ title: "Vídeo eliminado com sucesso!" });
+    } catch {
+      toast({ title: "Erro ao eliminar vídeo", variant: "destructive" });
+    } finally {
+      setDeleteDialogOpen(false);
+      setVideoToDelete(null);
     }
   };
 
@@ -89,7 +194,6 @@ const VideoReels = () => {
   }, [currentIndex]);
 
   useEffect(() => {
-    // Play current, pause others
     videoRefs.current.forEach((video, i) => {
       if (!video) return;
       if (i === currentIndex) {
@@ -191,9 +295,17 @@ const VideoReels = () => {
                 )}
               </button>
 
-              <button className="flex flex-col items-center gap-1">
-                <Heart className="h-7 w-7 text-white" />
-                <span className="text-white text-[10px]">{video.views_count}</span>
+              {/* Like */}
+              <button
+                className="flex flex-col items-center gap-1"
+                onClick={() => handleLike(video.id)}
+              >
+                <Heart
+                  className={`h-7 w-7 transition-colors ${
+                    video.is_liked ? "text-red-500 fill-red-500" : "text-white"
+                  }`}
+                />
+                <span className="text-white text-[10px]">{video.likes_count || 0}</span>
               </button>
 
               <button className="flex flex-col items-center gap-1" onClick={() => user ? navigate("/messages") : navigate("/auth")}>
@@ -209,6 +321,22 @@ const VideoReels = () => {
               <button className="flex flex-col items-center gap-1" onClick={() => setMuted(!muted)}>
                 {muted ? <VolumeX className="h-6 w-6 text-white" /> : <Volume2 className="h-6 w-6 text-white" />}
               </button>
+
+              {/* Owner actions */}
+              {user && video.seller_id === user.id && (
+                <>
+                  <button
+                    className="flex flex-col items-center gap-1"
+                    onClick={() => {
+                      setVideoToDelete(video.id);
+                      setDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="h-6 w-6 text-red-400" />
+                    <span className="text-white text-[10px]">Eliminar</span>
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Bottom info */}
@@ -228,6 +356,27 @@ const VideoReels = () => {
           </div>
         ))}
       </div>
+
+      {/* Delete dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar vídeo?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O vídeo será removido permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteVideo}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <BottomNav />
     </div>

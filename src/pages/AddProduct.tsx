@@ -13,8 +13,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const categories = [
-  "Electrónicos", "Moda", "Veículos", "Casa", "Games",
-  "Desportos", "Bebés", "Beleza", "Outros",
+  { label: "Eletrônicos", value: "eletronicos" },
+  { label: "Moda", value: "moda" },
+  { label: "Veículos", value: "veiculos" },
+  { label: "Casa", value: "casa" },
+  { label: "Games", value: "games" },
+  { label: "Esportes", value: "esportes" },
+  { label: "Bebês", value: "bebes" },
+  { label: "Beleza", value: "beleza" },
+  { label: "Outros", value: "geral" },
 ];
 
 const AddProduct = () => {
@@ -27,7 +34,7 @@ const AddProduct = () => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
-  const [category, setCategory] = useState("Outros");
+  const [category, setCategory] = useState("geral");
   const [location, setLocation] = useState("");
   const [isUrgent, setIsUrgent] = useState(false);
   const [images, setImages] = useState<string[]>([]);
@@ -252,9 +259,9 @@ const AddProduct = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
+                 {categories.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

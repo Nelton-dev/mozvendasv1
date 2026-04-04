@@ -65,6 +65,10 @@ const Messages = () => {
             conversations={conversations}
             selectedId={selectedId}
             onSelect={handleSelectConversation}
+            onDelete={() => {
+              setSelectedId(null);
+              setShowChat(false);
+            }}
           />
         </div>
 
