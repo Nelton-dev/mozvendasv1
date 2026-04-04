@@ -13,8 +13,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const categories = [
-  "Electrónicos", "Moda", "Veículos", "Casa", "Games",
-  "Desportos", "Bebés", "Beleza", "Outros",
+  { label: "Eletrônicos", value: "eletronicos" },
+  { label: "Moda", value: "moda" },
+  { label: "Veículos", value: "veiculos" },
+  { label: "Casa", value: "casa" },
+  { label: "Games", value: "games" },
+  { label: "Esportes", value: "esportes" },
+  { label: "Bebês", value: "bebes" },
+  { label: "Beleza", value: "beleza" },
+  { label: "Outros", value: "geral" },
 ];
 
 const EditProduct = () => {
