@@ -34,7 +34,7 @@ const AddProduct = () => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
-  const [category, setCategory] = useState("Outros");
+  const [category, setCategory] = useState("geral");
   const [location, setLocation] = useState("");
   const [isUrgent, setIsUrgent] = useState(false);
   const [images, setImages] = useState<string[]>([]);
