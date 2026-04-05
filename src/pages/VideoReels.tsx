@@ -41,7 +41,7 @@ const VideoReels = () => {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { toast } = useToast();
+  
 
   useEffect(() => {
     fetchVideos();
