@@ -308,7 +308,14 @@ const VideoReels = () => {
                 <span className="text-white text-[10px]">{video.likes_count || 0}</span>
               </button>
 
-              <button className="flex flex-col items-center gap-1" onClick={() => user ? navigate("/messages") : navigate("/auth")}>
+              <button className="flex flex-col items-center gap-1" onClick={() => {
+                if (!user) {
+                  toast({ title: "Faça login para enviar mensagens", variant: "destructive" });
+                  navigate("/auth");
+                  return;
+                }
+                navigate("/messages");
+              }}>
                 <MessageCircle className="h-7 w-7 text-white" />
                 <span className="text-white text-[10px]">Chat</span>
               </button>

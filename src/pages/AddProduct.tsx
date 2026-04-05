@@ -28,6 +28,26 @@ const AddProduct = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [sellerChecked, setSellerChecked] = useState(false);
+
+  useEffect(() => {
+    if (!user) { navigate("/auth"); return; }
+    supabase
+      .from("profiles")
+      .select("is_seller_mode")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (!data?.is_seller_mode) {
+          toast({ title: "Apenas vendedores podem criar anúncios", variant: "destructive" });
+          navigate("/");
+        } else {
+          setSellerChecked(true);
+        }
+      });
+  }, [user]);
+
+  if (!sellerChecked) return null;
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [title, setTitle] = useState("");

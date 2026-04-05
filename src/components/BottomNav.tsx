@@ -1,16 +1,29 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Home, Play, Plus, User, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isSeller, setIsSeller] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsSeller(false); return; }
+    supabase
+      .from("profiles")
+      .select("is_seller_mode")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => setIsSeller(data?.is_seller_mode ?? false));
+  }, [user]);
 
   const navItems = [
     { icon: Home, label: "Início", active: true, path: "/" },
     { icon: Play, label: "Reels", path: "/reels" },
-    { icon: Plus, label: "Anunciar", isAction: true, path: user ? "/add-product" : "/auth" },
+    ...(isSeller ? [{ icon: Plus, label: "Anunciar", isAction: true, path: "/add-product" }] : []),
     { icon: MessageCircle, label: "Chat", path: user ? "/messages" : "/auth" },
     { icon: User, label: "Perfil", path: user ? "/profile" : "/auth" },
   ];
