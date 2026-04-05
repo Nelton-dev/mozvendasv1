@@ -183,7 +183,7 @@ const VideoReels = () => {
 
       if (error) throw error;
       setVideos((prev) => prev.filter((v) => v.id !== videoToDelete));
-      toast({ title: "Vídeo eliminado com sucesso!" });
+      toast.success("Vídeo eliminado com sucesso!");
     } catch {
       toast({ title: "Erro ao eliminar vídeo", variant: "destructive" });
     } finally {
