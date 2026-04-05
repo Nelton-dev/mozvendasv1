@@ -44,6 +44,14 @@ const VideoReels = () => {
   
 
   useEffect(() => {
+    if (!loading && videos.length > 0 && !hasInteracted) {
+      toast("🔊 Toque no vídeo para ativar o som", {
+        duration: 3000,
+      });
+    }
+  }, [loading, videos.length]);
+
+  useEffect(() => {
     fetchVideos();
   }, [user]);
 
