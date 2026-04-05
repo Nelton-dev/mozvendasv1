@@ -29,6 +29,16 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sellerChecked, setSellerChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [originalPrice, setOriginalPrice] = useState("");
+  const [category, setCategory] = useState("geral");
+  const [location, setLocation] = useState("");
+  const [isUrgent, setIsUrgent] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
@@ -48,16 +58,6 @@ const AddProduct = () => {
   }, [user]);
 
   if (!sellerChecked) return null;
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [originalPrice, setOriginalPrice] = useState("");
-  const [category, setCategory] = useState("geral");
-  const [location, setLocation] = useState("");
-  const [isUrgent, setIsUrgent] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
