@@ -223,7 +223,7 @@ const VideoReels = () => {
       }).catch(() => {});
     } else {
       await navigator.clipboard.writeText(window.location.href);
-      toast({ title: "Link copiado!" });
+      toast("Link copiado!");
     }
   };
 
