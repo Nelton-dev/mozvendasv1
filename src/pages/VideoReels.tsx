@@ -32,7 +32,7 @@ interface VideoReel {
 const VideoReels = () => {
   const [videos, setVideos] = useState<VideoReel[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
@@ -308,7 +308,14 @@ const VideoReels = () => {
                 <span className="text-white text-[10px]">{video.likes_count || 0}</span>
               </button>
 
-              <button className="flex flex-col items-center gap-1" onClick={() => user ? navigate("/messages") : navigate("/auth")}>
+              <button className="flex flex-col items-center gap-1" onClick={() => {
+                if (!user) {
+                  toast({ title: "Faça login para enviar mensagens", variant: "destructive" });
+                  navigate("/auth");
+                  return;
+                }
+                navigate("/messages");
+              }}>
                 <MessageCircle className="h-7 w-7 text-white" />
                 <span className="text-white text-[10px]">Chat</span>
               </button>

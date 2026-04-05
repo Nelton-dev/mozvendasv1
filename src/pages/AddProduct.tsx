@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Camera, Loader2, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ const AddProduct = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [sellerChecked, setSellerChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [title, setTitle] = useState("");
@@ -38,6 +39,25 @@ const AddProduct = () => {
   const [location, setLocation] = useState("");
   const [isUrgent, setIsUrgent] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!user) { navigate("/auth"); return; }
+    supabase
+      .from("profiles")
+      .select("is_seller_mode")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (!data?.is_seller_mode) {
+          toast({ title: "Apenas vendedores podem criar anúncios", variant: "destructive" });
+          navigate("/");
+        } else {
+          setSellerChecked(true);
+        }
+      });
+  }, [user]);
+
+  if (!sellerChecked) return null;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
