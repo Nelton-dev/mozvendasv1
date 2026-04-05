@@ -32,7 +32,8 @@ interface VideoReel {
 const VideoReels = () => {
   const [videos, setVideos] = useState<VideoReel[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
