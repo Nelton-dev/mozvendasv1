@@ -32,7 +32,8 @@ interface VideoReel {
 const VideoReels = () => {
   const [videos, setVideos] = useState<VideoReel[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
@@ -271,11 +272,22 @@ const VideoReels = () => {
               className="h-full w-full object-cover"
               loop
               playsInline
+              autoPlay={index === 0}
               muted={muted}
               poster={video.thumbnail_url || undefined}
               onClick={() => {
+                if (!hasInteracted) {
+                  setHasInteracted(true);
+                  setMuted(false);
+                }
                 const v = videoRefs.current[index];
-                if (v) v.paused ? v.play() : v.pause();
+                if (v) {
+                  if (v.paused) {
+                    v.play();
+                  } else {
+                    v.pause();
+                  }
+                }
               }}
             />
 
