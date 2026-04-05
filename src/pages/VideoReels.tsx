@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   ArrowLeft, Heart, MessageCircle, Share2, Volume2, VolumeX,
   Play, ShoppingBag, User, Trash2, Edit
@@ -41,7 +41,15 @@ const VideoReels = () => {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { toast } = useToast();
+  
+
+  useEffect(() => {
+    if (!loading && videos.length > 0 && !hasInteracted) {
+      toast("🔊 Toque no vídeo para ativar o som", {
+        duration: 3000,
+      });
+    }
+  }, [loading, videos.length]);
 
   useEffect(() => {
     fetchVideos();
@@ -175,9 +183,9 @@ const VideoReels = () => {
 
       if (error) throw error;
       setVideos((prev) => prev.filter((v) => v.id !== videoToDelete));
-      toast({ title: "Vídeo eliminado com sucesso!" });
+      toast.success("Vídeo eliminado com sucesso!");
     } catch {
-      toast({ title: "Erro ao eliminar vídeo", variant: "destructive" });
+      toast.error("Erro ao eliminar vídeo");
     } finally {
       setDeleteDialogOpen(false);
       setVideoToDelete(null);
@@ -215,7 +223,7 @@ const VideoReels = () => {
       }).catch(() => {});
     } else {
       await navigator.clipboard.writeText(window.location.href);
-      toast({ title: "Link copiado!" });
+      toast("Link copiado!");
     }
   };
 
@@ -322,7 +330,7 @@ const VideoReels = () => {
 
               <button className="flex flex-col items-center gap-1" onClick={() => {
                 if (!user) {
-                  toast({ title: "Faça login para enviar mensagens", variant: "destructive" });
+                  toast.error("Faça login para enviar mensagens");
                   navigate("/auth");
                   return;
                 }
