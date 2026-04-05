@@ -330,7 +330,7 @@ const VideoReels = () => {
 
               <button className="flex flex-col items-center gap-1" onClick={() => {
                 if (!user) {
-                  toast({ title: "Faça login para enviar mensagens", variant: "destructive" });
+                  toast.error("Faça login para enviar mensagens");
                   navigate("/auth");
                   return;
                 }
