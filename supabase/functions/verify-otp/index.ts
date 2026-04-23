@@ -17,16 +17,22 @@ async function hashCode(code: string): Promise<string> {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Generic response used for any non-success path so we never leak account
+  // existence (or lack thereof) to unauthenticated callers.
+  const genericInvalid = () =>
+    new Response(JSON.stringify({ error: "Código inválido ou expirado" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const SITE_URL = Deno.env.get("SITE_URL") ?? "";
 
     const { phone, code } = await req.json();
-    if (!phone || !code) {
-      return new Response(JSON.stringify({ error: "Telefone e código são obrigatórios" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!phone || !code || typeof phone !== "string" || typeof code !== "string") {
+      return genericInvalid();
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -44,13 +50,13 @@ serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    if (otpError) throw new Error(`DB error: ${otpError.message}`);
+    if (otpError) {
+      console.error("verify-otp DB error:", otpError.message);
+      return genericInvalid();
+    }
 
     if (!otpData) {
-      return new Response(JSON.stringify({ error: "Código inválido ou expirado" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return genericInvalid();
     }
 
     // Mark as verified
@@ -63,42 +69,46 @@ serve(async (req) => {
       .eq("whatsapp_number", phone)
       .maybeSingle();
 
+    // If no matching profile, return success without revealing it.
+    // The user simply won't get an email — this prevents account enumeration.
     if (!profile) {
-      return new Response(JSON.stringify({ error: "Nenhuma conta encontrada com este número" }), {
-        status: 404,
+      return new Response(JSON.stringify({ verified: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Get user email
+    // Get user email (server-side only, never returned to client)
     const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
-    if (!userData?.user?.email) {
-      return new Response(JSON.stringify({ error: "Erro ao recuperar dados do usuário" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const email = userData?.user?.email;
+
+    if (email) {
+      // Send the password recovery email server-side via Supabase Auth.
+      // This delivers the reset link to the user's verified inbox — so even if
+      // an attacker brute-forces the OTP they cannot intercept the recovery
+      // link (it goes to email, not to the API response).
+      const redirectTo = SITE_URL
+        ? `${SITE_URL}/reset-password`
+        : undefined;
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo ? { redirectTo } : undefined,
+      );
+
+      if (resetError) {
+        console.error("verify-otp reset email error:", resetError.message);
+      }
     }
 
-    // Generate recovery link for this user
-    const { data: recoveryData, error: recoveryError } = await supabase.auth.admin.generateLink({
-      type: "recovery",
-      email: userData.user.email,
-    });
-
-    if (recoveryError) throw new Error(`Recovery error: ${recoveryError.message}`);
-
-    return new Response(JSON.stringify({
-      success: true,
-      verified: true,
-      recovery_token: recoveryData.properties?.hashed_token,
-      email: userData.user.email,
-    }), {
+    // Never return email or recovery token to the client.
+    return new Response(JSON.stringify({ verified: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Erro desconhecido";
     console.error("verify-otp error:", msg);
-    return new Response(JSON.stringify({ error: msg }), {
+    // Generic message to client, detail stays in server logs.
+    return new Response(JSON.stringify({ error: "Erro ao verificar código" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
