@@ -1,42 +1,70 @@
 
 
-## Plan: Account Deletion 24h Countdown + SMS OTP Fix
+## Plan: Address Remaining Security Findings
 
-### Problem Analysis
+The fresh scan returned 7 findings. Here's how I propose to handle each — splitting into **fix**, **harden**, and **ignore (with justification)**.
 
-1. **Account deletion**: Currently uses 3-day grace period. User wants 24 hours with a live countdown timer.
-2. **SMS OTP error**: The logs show `'From' +15005550006 is not a Twilio phone number`. The fallback number `+15005550006` is a Twilio test number that only works in test mode. The user needs to provide their real Twilio phone number, or we need to store it as a secret.
+### 1. Fix — Realtime channel authorization (ERROR)
 
-### Changes
+`realtime.messages` has no RLS, so any authenticated user can subscribe to any conversation channel.
 
-**1. Change deletion period from 3 days to 24 hours**
+- Add RLS policies on `realtime.messages` scoping `SELECT` to topics the user actually participates in (look up the conversation by `topic` and check `buyer_id = auth.uid()` OR `seller_id = auth.uid()`).
+- Ensure `realtime.messages` has RLS enabled.
 
-- **DB Migration**: Alter the `account_deletion_requests` table default for `scheduled_deletion_at` from `now() + '3 days'` to `now() + '24 hours'`.
-- **Edge Function** (`supabase/functions/manage-account-deletion/index.ts`): Update message text from "3 dias" to "24 horas".
-- **Frontend** (`src/pages/AccountSettings.tsx`):
-  - Update all "3 dias" references to "24 horas".
-  - Add a live countdown timer using `setInterval` that updates every second, showing hours, minutes, and seconds remaining (e.g., "23h 45m 12s").
-  - Display the countdown prominently in the deletion status card.
+### 2. Fix — Tighten `video_likes` SELECT (WARN)
 
-**2. Fix SMS OTP "From" number**
+Currently `USING (true)` for authenticated users — exposes per-user like activity.
 
-- The Twilio connector requires a valid "From" phone number (a number you purchased in Twilio). The current fallback `+15005550006` is a test-only number.
-- **Add a secret** `TWILIO_FROM_NUMBER` for the user to input their real Twilio phone number.
-- **Update** `supabase/functions/send-otp-sms/index.ts` to read `TWILIO_FROM_NUMBER` from env instead of using the hardcoded test fallback.
+- Drop the broad policy.
+- Replace with: `auth.uid() = user_id` (users see only their own likes).
+- Aggregate like counts on each video are already stored via `videos.likes_count`, so the feed UI is unaffected.
 
-### Files to Edit
+### 3. Harden — Profiles exposure guidance (WARN)
 
-| File | Change |
+The finding flags risk that a future broad policy could leak `whatsapp_number`. Today, `profiles` is owner-only and a `public_profiles` view is used for public reads. This is already correctly designed.
+
+- Verify `public_profiles` view excludes `whatsapp_number` and is the only public-facing surface.
+- No code change required if confirmed; mark as **ignored** with rationale documenting the existing safe pattern.
+
+### 4. Ignore — Security Definer View (ERROR, intentional)
+
+`public_profiles` view is intentionally `SECURITY DEFINER` so anonymous browsers can see sanitized seller info without exposing `profiles` directly. This is the documented Lovable pattern for safe public profiles.
+
+- Mark as ignored with explanation.
+
+### 5. Ignore ×3 — Public bucket listing (WARN, intentional)
+
+`product-images`, `product-videos`, `avatars` are public marketplace buckets — listing is acceptable since URLs are already public and content is meant to be discoverable.
+
+- Mark all three as ignored with the same rationale.
+
+### Files / Operations
+
+| Item | Action |
 |------|--------|
-| DB Migration | Change `scheduled_deletion_at` default to `now() + '24 hours'` |
-| `supabase/functions/manage-account-deletion/index.ts` | Update "3 dias" to "24 horas" in messages |
-| `src/pages/AccountSettings.tsx` | Update text to "24 horas"; add live countdown with `setInterval` showing HH:MM:SS |
-| `supabase/functions/send-otp-sms/index.ts` | Use `TWILIO_FROM_NUMBER` env var instead of hardcoded test number |
-| New secret: `TWILIO_FROM_NUMBER` | User must provide their purchased Twilio phone number |
+| New migration | RLS on `realtime.messages` scoped to conversation participants |
+| Same migration | Replace `video_likes` SELECT policy with owner-only |
+| Security findings | Mark Realtime + video_likes as fixed after migration |
+| Security findings | Ignore: SECURITY DEFINER view, 3× public bucket listing, profiles WhatsApp warning |
+| Re-scan | Run final security scan to confirm clean state |
 
-### Technical Details
+### Technical Detail — Realtime RLS
 
-- The countdown timer will use `useEffect` with a 1-second interval, computing the difference between `scheduled_deletion_at` and `Date.now()`, formatting as `XXh XXm XXs`.
-- The interval clears on unmount or when deletion is cancelled.
-- For the SMS fix, the user will be prompted to enter their Twilio phone number as a secret before the function can work.
+```sql
+ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can subscribe to their own conversations"
+ON realtime.messages
+FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.conversations c
+    WHERE c.id::text = realtime.messages.topic
+      AND (c.buyer_id = auth.uid() OR c.seller_id = auth.uid())
+  )
+);
+```
+
+(Topic naming in `useMessages.ts` will be verified to match `conversation.id` before applying.)
 
