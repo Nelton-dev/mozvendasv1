@@ -62,14 +62,12 @@ const OtpRecovery = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      if (data?.verified && data?.email) {
-        setRecoveryEmail(data.email);
-        // Send password reset email
-        await supabase.auth.resetPasswordForEmail(data.email, {
-          redirectTo: `${window.location.origin}/reset-password`,
-        });
+      if (data?.verified) {
         setStep("reset");
-        toast({ title: "Código verificado!", description: "Um link de redefinição foi enviado ao seu email." });
+        toast({
+          title: "Código verificado!",
+          description: "Se este número estiver associado a uma conta, enviaremos um link de redefinição ao email cadastrado.",
+        });
       }
     } catch (err: any) {
       toast({ title: "Erro na verificação", description: err.message, variant: "destructive" });
@@ -123,7 +121,7 @@ const OtpRecovery = () => {
                 </div>
                 <CardTitle className="text-xl">Verificação concluída!</CardTitle>
                 <CardDescription>
-                  Enviamos um link de redefinição de senha para <strong>{recoveryEmail}</strong>. Verifique seu email.
+                  Se este número estiver associado a uma conta, enviaremos um link de redefinição ao email cadastrado. Verifique a sua caixa de entrada.
                 </CardDescription>
               </>
             )}
