@@ -37,8 +37,10 @@ serve(async (req) => {
       });
     }
 
-    // Generate 6-digit OTP
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    // Generate 6-digit OTP using cryptographically secure RNG
+    const randomBytes = new Uint32Array(1);
+    crypto.getRandomValues(randomBytes);
+    const code = String(100000 + (randomBytes[0] % 900000)).padStart(6, "0");
     const hashedCode = await hashCode(code);
     const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 min
 
