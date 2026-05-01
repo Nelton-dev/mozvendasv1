@@ -1,6 +1,5 @@
-import { Heart, MapPin, MessageCircle, Share2, MoreHorizontal, User } from "lucide-react";
+import { Heart, MapPin, MessageCircle, Share2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useStartConversation } from "@/hooks/useStartConversation";
@@ -72,10 +71,9 @@ const ProductCard = ({
 
   const formatPrice = (value: number) => {
     return new Intl.NumberFormat("pt-MZ", {
-      style: "currency",
-      currency: "MZN",
+      style: "decimal",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
@@ -84,29 +82,93 @@ const ProductCard = ({
     : 0;
 
   return (
-    <article className="group bg-card rounded-2xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-elevated hover:-translate-y-1">
-      {/* Seller Header */}
-      <div className="flex items-center justify-between p-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          {seller.avatar ? (
-            <img
-              src={seller.avatar}
-              alt={seller.name}
-              className="h-8 w-8 rounded-full object-cover ring-2 ring-primary/20"
-            />
-          ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary ring-2 ring-primary/20">
-              <User className="h-4 w-4 text-muted-foreground" />
-            </div>
+    <article className="group bg-card rounded-3xl overflow-hidden border border-border/60 transition-all duration-300 hover:shadow-warm hover:-translate-y-1 animate-fade-in">
+      {/* Product Image — 4:5 cinematic */}
+      <div className="relative overflow-hidden rounded-3xl m-2" style={{ aspectRatio: "4/5" }}>
+        <img
+          src={image}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+
+        {/* Top-left badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {isNew && (
+            <span className="font-display italic text-[11px] font-semibold px-2.5 py-1 bg-accent text-accent-foreground rounded-full shadow-soft tracking-wide">
+              novo
+            </span>
           )}
-          <div>
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-semibold text-foreground">
+          {isUrgent && (
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 bg-primary text-primary-foreground rounded-full shadow-soft">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground animate-pulse-dot" />
+              urgente
+            </span>
+          )}
+          {discount > 0 && (
+            <span className="text-[11px] font-bold px-2.5 py-1 bg-foreground text-background rounded-full shadow-soft">
+              −{discount}%
+            </span>
+          )}
+        </div>
+
+        {/* Like button — top right */}
+        <button
+          onClick={handleLike}
+          className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-card/85 backdrop-blur-md shadow-soft transition-transform hover:scale-110"
+          aria-label="Favoritar"
+        >
+          <Heart
+            className={cn(
+              "h-4 w-4 transition-all",
+              liked ? "fill-primary text-primary scale-110" : "text-foreground"
+            )}
+            strokeWidth={1.75}
+          />
+        </button>
+
+        {/* Price tag — bottom left, editorial */}
+        <div className="absolute bottom-3 left-3 bg-card/95 backdrop-blur-md rounded-2xl px-3 py-1.5 shadow-card">
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-display italic text-xl font-bold text-foreground leading-none">
+              {formatPrice(price)}
+            </span>
+            <span className="text-[10px] font-semibold text-muted-foreground tracking-wider">MZN</span>
+          </div>
+          {originalPrice && (
+            <span className="block text-[10px] text-muted-foreground line-through leading-none mt-0.5">
+              {formatPrice(originalPrice)} MZN
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="px-4 pt-1 pb-4">
+        <h3 className="font-semibold text-foreground line-clamp-2 mb-3 leading-snug">
+          {title}
+        </h3>
+
+        {/* Seller row — compact */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2 min-w-0">
+            {seller.avatar ? (
+              <img
+                src={seller.avatar}
+                alt={seller.name}
+                className="h-6 w-6 rounded-full object-cover ring-1 ring-border"
+              />
+            ) : (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary">
+                <User className="h-3 w-3 text-muted-foreground" />
+              </div>
+            )}
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="text-xs font-medium text-foreground truncate">
                 {seller.name}
               </span>
               {seller.verified && (
                 <svg
-                  className="h-4 w-4 text-primary"
+                  className="h-3.5 w-3.5 text-support flex-shrink-0"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -114,90 +176,35 @@ const ProductCard = ({
                 </svg>
               )}
             </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              {location}
-            </div>
           </div>
-        </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {isNew && (
-            <Badge className="bg-primary text-primary-foreground border-0">
-              Novo
-            </Badge>
-          )}
-          {isUrgent && (
-            <Badge className="bg-accent text-accent-foreground border-0">
-              Urgente
-            </Badge>
-          )}
-          {discount > 0 && (
-            <Badge className="bg-foreground text-background border-0">
-              -{discount}%
-            </Badge>
-          )}
-        </div>
-      </div>
-
-      {/* Product Info */}
-      <div className="p-4">
-        <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
-          {title}
-        </h3>
-        <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-2xl font-bold text-primary">
-            {formatPrice(price)}
-          </span>
-          {originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
-              {formatPrice(originalPrice)}
-            </span>
-          )}
+          <div className="flex items-center gap-1 text-[11px] text-muted-foreground flex-shrink-0">
+            <MapPin className="h-3 w-3" strokeWidth={1.75} />
+            <span className="truncate max-w-[80px]">{location}</span>
+          </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-border">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleLike}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Heart
-                className={cn(
-                  "h-5 w-5 transition-all",
-                  liked && "fill-accent text-accent scale-110"
-                )}
-              />
-              {likeCount > 0 && likeCount}
-            </button>
-            <button
-              onClick={handleContact}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <MessageCircle className="h-5 w-5" />
-              {comments > 0 && comments}
-            </button>
-            <button className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
-              <Share2 className="h-5 w-5" />
-            </button>
-          </div>
-          <Button
-            size="sm"
-            className="gradient-primary text-primary-foreground border-0 shadow-soft"
-            onClick={handleBuy}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleContact}
+            className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full border border-border text-foreground transition-colors hover:bg-secondary"
+            aria-label="Mensagem"
           >
+            <MessageCircle className="h-4 w-4" strokeWidth={1.75} />
+          </button>
+          <button
+            className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full border border-border text-foreground transition-colors hover:bg-secondary"
+            aria-label="Partilhar"
+          >
+            <Share2 className="h-4 w-4" strokeWidth={1.75} />
+          </button>
+          <Button
+            onClick={handleBuy}
+            className="flex-1 h-10 rounded-full bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 border-0 gap-2 font-semibold shadow-soft"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.413c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.595 5.392l-.999 3.648 3.893-1.039z"/>
+            </svg>
             Comprar
           </Button>
         </div>

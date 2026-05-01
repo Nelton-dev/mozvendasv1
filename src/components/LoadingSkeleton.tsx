@@ -1,24 +1,23 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const ProductCardSkeleton = () => (
-  <div className="bg-card rounded-2xl shadow-card overflow-hidden animate-fade-in">
-    <div className="flex items-center gap-2 p-3 border-b border-border">
-      <Skeleton className="h-8 w-8 rounded-full" />
-      <div className="space-y-1.5">
-        <Skeleton className="h-3.5 w-24" />
-        <Skeleton className="h-3 w-16" />
-      </div>
+  <div className="bg-card rounded-3xl overflow-hidden border border-border/60 animate-fade-in">
+    <div className="m-2">
+      <Skeleton className="w-full rounded-3xl bg-muted" style={{ aspectRatio: "4/5" }} />
     </div>
-    <Skeleton className="aspect-square w-full" />
-    <div className="p-4 space-y-3">
-      <Skeleton className="h-4 w-3/4" />
-      <Skeleton className="h-7 w-1/3" />
-      <div className="flex justify-between pt-3 border-t border-border">
-        <div className="flex gap-4">
-          <Skeleton className="h-5 w-10" />
-          <Skeleton className="h-5 w-10" />
+    <div className="px-4 pt-1 pb-4 space-y-3">
+      <Skeleton className="h-4 w-3/4 bg-muted" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-6 w-6 rounded-full bg-muted" />
+          <Skeleton className="h-3 w-20 bg-muted" />
         </div>
-        <Skeleton className="h-9 w-20 rounded-md" />
+        <Skeleton className="h-3 w-14 bg-muted" />
+      </div>
+      <div className="flex gap-2">
+        <Skeleton className="h-10 w-10 rounded-full bg-muted" />
+        <Skeleton className="h-10 w-10 rounded-full bg-muted" />
+        <Skeleton className="h-10 flex-1 rounded-full bg-muted" />
       </div>
     </div>
   </div>
@@ -51,6 +50,6 @@ export const PageLoadingSpinner = () => (
         />
       ))}
     </div>
-    <p className="text-sm text-muted-foreground animate-pulse">Carregando...</p>
+    <p className="text-sm text-muted-foreground animate-pulse">A carregar...</p>
   </div>
 );

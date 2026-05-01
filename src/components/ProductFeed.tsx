@@ -104,12 +104,17 @@ const ProductFeed = ({ selectedCategory }: ProductFeedProps) => {
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <p className="text-lg font-semibold text-foreground mb-1">
-          {selectedCategory ? "Nenhum produto nesta categoria" : "Nenhum produto ainda"}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {selectedCategory ? "Tente outra categoria" : "Seja o primeiro a publicar um anúncio!"}
+      <div className="flex flex-col items-center justify-center py-24 text-center px-4">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-5">
+          <span className="font-display italic text-4xl text-primary">∅</span>
+        </div>
+        <h3 className="font-display text-2xl font-semibold text-foreground mb-2">
+          {selectedCategory ? "Banca vazia por aqui" : "Aqui ainda está vazio"}
+        </h3>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          {selectedCategory
+            ? "Experimenta outra categoria — tem coisa boa a chegar."
+            : "Seja o primeiro a abrir banca no MOZ VENDAS."}
         </p>
       </div>
     );

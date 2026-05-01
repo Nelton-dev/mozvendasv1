@@ -29,18 +29,18 @@ const Header = () => {
         {/* Logo */}
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
           <img src={mozLogo} alt="MOZ VENDAS" className="h-9 w-9" />
-          <span className="text-xl font-bold text-foreground hidden sm:inline">
-            MOZ <span className="text-primary">VENDAS</span>
+          <span className="font-display text-2xl font-bold tracking-tight hidden sm:inline leading-none">
+            <span className="text-primary italic">moz</span><span className="text-foreground">vendas</span>
           </span>
         </div>
 
         {/* Search */}
         <div className="flex-1 max-w-md">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.75} />
             <Input
-              placeholder="Buscar produtos..."
-              className="pl-10 bg-secondary border-0 focus-visible:ring-primary"
+              placeholder="O que procuras hoje?"
+              className="pl-11 h-10 rounded-full bg-secondary border-0 focus-visible:ring-2 focus-visible:ring-primary placeholder:text-muted-foreground/70"
             />
           </div>
         </div>
