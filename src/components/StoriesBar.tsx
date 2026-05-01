@@ -49,8 +49,8 @@ const StoriesBar = () => {
               key={story.id}
               className="flex flex-col items-center gap-1.5 min-w-fit group"
             >
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full p-0.5 transition-transform group-hover:scale-105 bg-border">
-                <div className="relative h-full w-full rounded-full bg-card p-0.5">
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full p-[2px] transition-transform group-hover:scale-105 gradient-story">
+                <div className="relative h-full w-full rounded-full bg-background p-[2px]">
                   {story.avatar_url ? (
                     <img
                       src={story.avatar_url}
@@ -63,8 +63,8 @@ const StoriesBar = () => {
                     </div>
                   )}
                   {story.isOwn && (
-                    <div className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-card">
-                      <Plus className="h-3 w-3" />
+                    <div className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-accent-foreground ring-2 ring-background shadow-soft">
+                      <Plus className="h-3 w-3" strokeWidth={2.5} />
                     </div>
                   )}
                 </div>
